@@ -1,0 +1,38 @@
+Parameters:
+  InstanceTypeParameter:
+    Type: String
+  AMI:
+    Type: String
+  Key:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: The key used to access the instance.
+Resources:
+  InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable HTTP access via port 80 and SSH access via port 22
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 0.0.0.0/0
+  MyInstance:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      ImageId: !Ref AMI
+      InstanceType:
+        Ref: InstanceTypeParameter
+      KeyName: !Ref Key
+      SecurityGroupIds:
+      - !Ref InstanceSecurityGroup
+      UserData:
+        Fn::Base64: |
+           #!/bin/bash
+           yum update -y
+           cd /home/ec2-user
+           wget https://releases.hashicorp.com/terraform/0.13.5/terraform_0.13.5_linux_amd64.zip
+           unzip terraform_0.13.5_linux_amd64.zip
+           sudo mv terraform /usr/local/bin/ && rm terraform_0.13.5_linux_amd64.zip
+           cd /usr/local/bin/
+           ./terraform
+           terraform --version
