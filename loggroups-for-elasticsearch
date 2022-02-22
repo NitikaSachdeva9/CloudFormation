@@ -1,0 +1,14 @@
+###This template creates log groups for AWS Elasticsearch###
+Parameters:
+	pelasticsearchdomain:
+		Type: 'AWS::SSM::Parameter::Value<String>'
+		Default: '/es/domainname'
+Resources:
+	rSearchLogGroup:
+		Type: AWS::Logs::LogGroup
+		Properties:
+			LogGroupName: !Sub '${pelasticsearchdomain}-logs'
+Outputs:
+	oSearchLogGroupARN:
+		Description: 'Here is the log group for search logs'
+		Value: !GetAtt rSearchLogGroup.Arn
